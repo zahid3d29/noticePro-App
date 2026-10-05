@@ -1,3 +1,14 @@
 .cache
 build
 node_modules
+
+# Credentials and local-only files
+.env
+.env.*
+.git
+.shopify
+.cursor
+.gemini
+.mcp.json
+prisma/*.sqlite
+prisma/*.sqlite-*
