@@ -1,0 +1,60 @@
+.noticepro-announcement-bar {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 48px;
+  background: var(--noticepro-background, #111827);
+  color: var(--noticepro-text, #ffffff);
+  text-align: center;
+  z-index: 50;
+}
+
+.noticepro-announcement-message {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.noticepro-announcement-link {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: var(--noticepro-text, #ffffff);
+  color: var(--noticepro-background, #111827);
+  text-decoration: none;
+}
+
+.noticepro-announcement-link:hover {
+  text-decoration: underline;
+}
+
+.noticepro-announcement-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: 0;
+  padding: 4px 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.noticepro-announcement-close:focus-visible,
+.noticepro-announcement-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .noticepro-announcement-bar {
+    padding: 12px 42px 12px 12px;
+  }
+}

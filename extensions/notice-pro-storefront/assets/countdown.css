@@ -1,0 +1,85 @@
+.noticepro-countdown-root {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.noticepro-countdown-root--sticky {
+  position: sticky;
+  top: var(--noticepro-countdown-desktop-offset, 0px);
+  z-index: 49;
+}
+
+.noticepro-countdown-bar {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 24px;
+  width: 100%;
+  padding: 12px 20px;
+  background: var(--noticepro-countdown-background, #00b9b8);
+  color: var(--noticepro-countdown-text, #ffffff);
+  font-family: inherit;
+  text-align: center;
+}
+
+.noticepro-countdown-message {
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.noticepro-countdown-timer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.noticepro-countdown-unit {
+  display: grid;
+  gap: 2px;
+  min-width: 32px;
+}
+
+.noticepro-countdown-number {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.noticepro-countdown-label {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.noticepro-countdown-expired {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .noticepro-countdown-root--sticky {
+    top: var(--noticepro-countdown-mobile-offset, 0px);
+  }
+
+  .noticepro-countdown-bar {
+    gap: 8px 16px;
+    padding: 12px 16px;
+  }
+
+  .noticepro-countdown-message {
+    font-size: 14px;
+  }
+
+  .noticepro-countdown-timer {
+    gap: 12px;
+  }
+}

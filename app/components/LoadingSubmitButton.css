@@ -1,0 +1,66 @@
+.noticepro-submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.noticepro-submit-button--primary {
+  background: #303030;
+  color: #ffffff;
+}
+
+.noticepro-submit-button--primary:hover:not(:disabled) {
+  background: #1a1a1a;
+}
+
+.noticepro-submit-button--delete {
+  background: #ffffff;
+  border-color: #b8bdc3;
+  color: #b42318;
+}
+
+.noticepro-submit-button--delete:hover:not(:disabled) {
+  background: #fff1f0;
+  border-color: #b42318;
+}
+
+.noticepro-submit-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.noticepro-submit-button:focus-visible {
+  outline: 3px solid #0f766e;
+  outline-offset: 3px;
+}
+
+.noticepro-submit-spinner {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: noticepro-submit-spin 0.7s linear infinite;
+}
+
+@keyframes noticepro-submit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .noticepro-submit-spinner {
+    animation: none;
+  }
+}

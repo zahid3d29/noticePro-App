@@ -1,0 +1,94 @@
+.shopify-block:has(> .noticepro-notice-root) {
+  width: 100%;
+  min-width: 0;
+}
+
+.noticepro-notice-root {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin: 16px auto;
+}
+
+.noticepro-notice-card {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  width: 100%;
+  padding: 20px 64px 20px 20px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 12px;
+  background: var(--noticepro-background, #fef3c7);
+  color: var(--noticepro-text, #111827);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.noticepro-notice-message {
+  flex: 1 1 260px;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.noticepro-notice-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  color: inherit;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.noticepro-notice-link:hover {
+  text-decoration: underline;
+}
+
+.noticepro-notice-dismiss {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.noticepro-notice-dismiss:focus-visible,
+.noticepro-notice-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .noticepro-notice-card {
+    padding: 16px 60px 16px 16px;
+    gap: 12px;
+  }
+
+  .noticepro-notice-message {
+    flex-basis: 100%;
+  }
+}

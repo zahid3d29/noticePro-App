@@ -1,0 +1,50 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "a38e75661e6c8c4c55b73a4f89ed9b7b"
+
+# Development placeholder. Set this to your deployed app URL before release.
+application_url = "https://example.com"
+embedded = true
+name = "NoticePro: Alerts & Countdowns"
+
+[access_scopes]
+# This app currently uses its own database and app proxy, not these Admin API scopes.
+scopes = ""
+
+[webhooks]
+api_version = "2026-10"
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/uninstalled"
+  topics = [ "app/uninstalled" ]
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/scopes_update"
+  topics = [ "app/scopes_update" ]
+
+  [[webhooks.subscriptions]]
+  compliance_topics = [ "customers/data_request" ]
+  uri = "/webhooks/customers/data_request"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = [ "customers/redact" ]
+  uri = "/webhooks/customers/redact"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = [ "shop/redact" ]
+  uri = "/webhooks/shop/redact"
+
+
+
+[auth]
+# Development placeholder. Set to your deployed app's auth callback URL before release.
+redirect_urls = [ "https://example.com/api/auth" ]
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[app_proxy]
+url = "/api/proxy"
+prefix = "apps"
+subpath = "noticepro"
