@@ -23,6 +23,12 @@ import {
 import CountdownPreview from "../features/widgets/CountdownPreview";
 import LoadingSubmitButton from "../components/LoadingSubmitButton";
 import { redirectWithSuccessToast } from "../features/widgets/success-toast.server";
+import { getAuthenticatedAppPlan } from "../features/billing/admin-plan.server";
+import {
+  canActivateAnotherWidget,
+  type AppPlan,
+} from "../features/billing/plan-policy.server";
+
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
@@ -43,7 +49,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { session } = await authenticate.admin(request);
+  const { session, admin } = await authenticate.admin(request);
   const formData = await request.formData();
 
   const actionType = String(formData.get("_action") || "create");
@@ -69,11 +75,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return redirectWithSuccessToast("countdown", "deleted");
   }
 
-  actionType === "update" && widgetId
-    ? await db.widget.findFirst({
-        where: widgetIdScope(session.shop, WIDGET_TYPES.COUNTDOWN, widgetId),
-      })
-    : null;
+
 
   const existingCountdown =
     actionType === "update" && widgetId
@@ -187,13 +189,26 @@ export async function action({ request }: ActionFunctionArgs) {
         actionType === "update" ? widgetId : undefined,
       ),
     });
-
     if (activeCount >= 1) {
-      return {
-        error:
-          "The Free plan allows one active Countdown. Save this one as a draft or deactivate your current Countdown first.",
-      };
+      let plan: AppPlan;
+
+      try {
+        plan = await getAuthenticatedAppPlan(admin, session.shop);
+      } catch {
+        return {
+          error:
+            "We could not verify your plan. Please try again, or save this Countdown as a draft.",
+        };
+      }
+
+      if (!canActivateAnotherWidget(plan, activeCount)) {
+        return {
+          error:
+            "The Free plan allows one active Countdown. Save this one as a draft or deactivate your current Countdown first.",
+        };
+      }
     }
+
   }
 
   const countdownData = {

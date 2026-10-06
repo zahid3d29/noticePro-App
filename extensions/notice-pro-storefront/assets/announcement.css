@@ -1,3 +1,11 @@
+.noticepro-announcement-stack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+
 .noticepro-announcement-bar {
   position: relative;
   box-sizing: border-box;

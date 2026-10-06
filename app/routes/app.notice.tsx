@@ -1,9 +1,4 @@
-import {
-  Form,
-  Link,
-  useActionData,
-  useLoaderData,
-} from "react-router";
+import { Form, Link, useActionData, useLoaderData } from "react-router";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 
 import { authenticate } from "../shopify.server";
@@ -17,6 +12,11 @@ import {
 } from "../features/widgets/widget.server";
 import LoadingSubmitButton from "../components/LoadingSubmitButton";
 import { redirectWithSuccessToast } from "../features/widgets/success-toast.server";
+import { getAuthenticatedAppPlan } from "../features/billing/admin-plan.server";
+import {
+  canActivateAnotherWidget,
+  type AppPlan,
+} from "../features/billing/plan-policy.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
@@ -44,7 +44,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { session } = await authenticate.admin(request);
+  const { session, admin } = await authenticate.admin(request);
   const formData = await request.formData();
 
   const actionType = String(formData.get("_action") || "create");
@@ -66,10 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     return redirectWithSuccessToast("notice", "deleted");
-
   }
-
-
 
   const name = String(formData.get("name") || "").trim();
   const message = String(formData.get("message") || "").trim();
@@ -120,10 +117,23 @@ export async function action({ request }: ActionFunctionArgs) {
     });
 
     if (activeWidgetCount >= 1) {
-      return {
-        error:
-          "The Free plan allows one active widget. Save this notice as a draft instead.",
-      };
+      let plan: AppPlan;
+
+      try {
+        plan = await getAuthenticatedAppPlan(admin, session.shop);
+      } catch {
+        return {
+          error:
+            "We could not verify your plan. Please try again, or save this Notice as a draft.",
+        };
+      }
+
+      if (!canActivateAnotherWidget(plan, activeWidgetCount)) {
+        return {
+          error:
+            "The Free plan allows one active Notice. Save this one as a draft or deactivate your current Notice first.",
+        };
+      }
     }
   }
 

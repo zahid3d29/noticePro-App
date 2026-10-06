@@ -1,9 +1,4 @@
-import {
-  Form,
-  Link,
-  useActionData,
-  useLoaderData,
-} from "react-router";
+import { Form, Link, useActionData, useLoaderData } from "react-router";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import LoadingSubmitButton from "../components/LoadingSubmitButton";
 
@@ -20,6 +15,11 @@ import {
   widgetScope,
 } from "../features/widgets/widget.server";
 import { redirectWithSuccessToast } from "../features/widgets/success-toast.server";
+import { getAuthenticatedAppPlan } from "../features/billing/admin-plan.server";
+import {
+  canActivateAnotherWidget,
+  type AppPlan,
+} from "../features/billing/plan-policy.server";
 
 function toDateTimeLocal(value: Date | null | undefined) {
   if (!value) return "";
@@ -35,6 +35,7 @@ function toDateTimeLocal(value: Date | null | undefined) {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
+
   const url = new URL(request.url);
   const editId = url.searchParams.get("edit");
 
@@ -59,7 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { session } = await authenticate.admin(request);
+  const { session, admin } = await authenticate.admin(request);
   const formData = await request.formData();
 
   const actionType = String(formData.get("_action") || "create");
@@ -80,10 +81,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     return redirectWithSuccessToast("announcement", "deleted");
-
   }
-
-
 
   const name = String(formData.get("name") || "").trim();
   const message = String(formData.get("message") || "").trim();
@@ -158,11 +156,26 @@ export async function action({ request }: ActionFunctionArgs) {
       ),
     });
 
+    // The first active Announcement is allowed on Free.
+    // Verify Pro only when exceeding that allowance.
     if (activeWidgetCount >= 1) {
-      return {
-        error:
-          "The Free plan allows one active widget. Save this widget as a draft instead.",
-      };
+      let plan: AppPlan;
+
+      try {
+        plan = await getAuthenticatedAppPlan(admin, session.shop);
+      } catch {
+        return {
+          error:
+            "We could not verify your plan. Please try again, or save this Announcement as a draft.",
+        };
+      }
+
+      if (!canActivateAnotherWidget(plan, activeWidgetCount)) {
+        return {
+          error:
+            "The Free plan allows one active Announcement. Save this one as a draft or deactivate your current Announcement first.",
+        };
+      }
     }
   }
 
@@ -182,12 +195,14 @@ export async function action({ request }: ActionFunctionArgs) {
   };
 
   if (actionType === "update") {
-    await db.widget.update({
-      where: {
-        id: widgetId,
-      },
+    const updated = await db.widget.updateMany({
+      where: widgetIdScope(session.shop, WIDGET_TYPES.ANNOUNCEMENT, widgetId),
       data: widgetData,
     });
+
+    if (updated.count === 0) {
+      return { error: "The announcement could not be found." };
+    }
   } else {
     await db.widget.create({
       data: {

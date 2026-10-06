@@ -5,6 +5,9 @@
 
 .noticepro-notice-root {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   width: 100%;
   min-width: 0;
   margin: 16px auto;
