@@ -99,7 +99,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     { saved: 0, active: 0, draft: 0 },
   );
 
-  return { cards, totals, plan };
+  const shopHandle = session.shop.replace(/\.myshopify\.com$/, "");
+
+  const pricingPlansUrl =
+    `https://admin.shopify.com/store/${encodeURIComponent(shopHandle)}` +
+    "/charges/noticepro-alerts-countdowns/pricing_plans";
+
+  return { cards, totals, plan, pricingPlansUrl };
 }
 
 const dashboardGridStyle = {
@@ -116,7 +122,8 @@ const dashboardCardStyle = {
 };
 
 export default function DashboardPage() {
-  const { cards, totals, plan } = useLoaderData<typeof loader>();
+  const { cards, totals, plan, pricingPlansUrl } =
+    useLoaderData<typeof loader>();
 
   const metrics = [
     { label: "Saved widgets", value: totals.saved },
@@ -335,6 +342,11 @@ export default function DashboardPage() {
             : plan === "FREE"
               ? "Free displays up to one eligible Announcement, one eligible Notice, and one eligible Countdown together. Additional widgets can be saved as drafts. Records retained after a downgrade are not deleted."
               : "We could not verify your current plan. Your saved widgets and counts remain available. Refresh to retry. Additional Active saves still require successful server-side plan verification."}
+        </p>
+        <p style={{ marginBottom: 0 }}>
+          <a href={pricingPlansUrl} target="_top">
+            Manage plan
+          </a>
         </p>
       </s-section>
     </s-page>
