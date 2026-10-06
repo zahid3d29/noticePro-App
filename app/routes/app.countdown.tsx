@@ -29,9 +29,17 @@ import {
   type AppPlan,
 } from "../features/billing/plan-policy.server";
 
-
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { session } = await authenticate.admin(request);
+  const { session, admin } = await authenticate.admin(request);
+
+  let plan: AppPlan | null = null;
+
+  try {
+    plan = await getAuthenticatedAppPlan(admin, session.shop);
+  } catch {
+    console.warn("NoticePro Countdown plan verification unavailable.");
+  }
+
   const editId = new URL(request.url).searchParams.get("edit");
 
   const countdowns = await db.widget.findMany({
@@ -45,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       })
     : null;
 
-  return { countdowns, editingCountdown };
+  return { countdowns, editingCountdown, plan };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -74,8 +82,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return redirectWithSuccessToast("countdown", "deleted");
   }
-
-
 
   const existingCountdown =
     actionType === "update" && widgetId
@@ -208,7 +214,6 @@ export async function action({ request }: ActionFunctionArgs) {
         };
       }
     }
-
   }
 
   const countdownData = {
@@ -275,7 +280,7 @@ function toLocalDateInput(date: Date) {
 }
 
 export default function CountdownPage() {
-  const { countdowns, editingCountdown } = useLoaderData<typeof loader>();
+  const { countdowns, editingCountdown, plan } = useLoaderData<typeof loader>();
 
   const actionData = useActionData<typeof action>();
   const location = useLocation();
@@ -323,9 +328,21 @@ export default function CountdownPage() {
         <div style={{ display: "grid", gap: "16px" }}>
           <p>Create a deadline-based offer timer for your storefront.</p>
 
-          <s-banner tone="info" heading="Free plan: one active widget per type">
-            You can run one Announcement, one Notice, and one Countdown at the
-            same time.
+          <s-banner
+            tone="info"
+            heading={
+              plan === "PRO"
+                ? "Pro plan: unlimited active widgets"
+                : plan === "FREE"
+                  ? "Free plan: one displayed widget per type"
+                  : "Plan verification unavailable"
+            }
+          >
+            {plan === "PRO"
+              ? "You can activate multiple Announcements, Notices, and Countdowns. Each Countdown uses its own deadline and expiry message."
+              : plan === "FREE"
+                ? "Free displays up to one eligible Announcement, one eligible Notice, and one eligible Countdown together. Save additional Countdowns as drafts. To activate a different Countdown, first deactivate the other Active Countdowns."
+                : "We could not verify your current plan. Refresh to retry. Draft saves and deletion remain available; additional Active saves require successful server-side plan verification."}
           </s-banner>
 
           <Form

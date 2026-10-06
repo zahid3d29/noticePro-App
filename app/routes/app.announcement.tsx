@@ -34,7 +34,15 @@ function toDateTimeLocal(value: Date | null | undefined) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { session } = await authenticate.admin(request);
+  const { session, admin } = await authenticate.admin(request);
+
+  let plan: AppPlan | null = null;
+
+  try {
+    plan = await getAuthenticatedAppPlan(admin, session.shop);
+  } catch {
+    console.warn("NoticePro Announcement plan verification unavailable.");
+  }
 
   const url = new URL(request.url);
   const editId = url.searchParams.get("edit");
@@ -56,6 +64,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return {
     widgets,
     editingWidget,
+    plan,
   };
 }
 
@@ -219,7 +228,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function AppHome() {
-  const { widgets, editingWidget } = useLoaderData<typeof loader>();
+  const { widgets, editingWidget, plan } = useLoaderData<typeof loader>();
+
   const actionData = useActionData<typeof action>();
   const isEditing = Boolean(editingWidget);
 
@@ -242,10 +252,21 @@ export default function AppHome() {
             announcements below.
           </p>
 
-          <s-banner tone="info" heading="Free plan: one active widget per type">
-            You can run one Announcement, one Notice, and one Countdown at the
-            same time. To activate another Announcement, save it as a draft or
-            deactivate your current Announcement first.
+          <s-banner
+            tone="info"
+            heading={
+              plan === "PRO"
+                ? "Pro plan: unlimited active widgets"
+                : plan === "FREE"
+                  ? "Free plan: one displayed widget per type"
+                  : "Plan verification unavailable"
+            }
+          >
+            {plan === "PRO"
+              ? "You can activate multiple Announcements, Notices, and Countdowns. Storefront display still depends on theme placement, scheduling, and visitor dismissal."
+              : plan === "FREE"
+                ? "Free displays up to one eligible Announcement, one eligible Notice, and one eligible Countdown together. Save additional Announcements as drafts. To activate a different Announcement, first deactivate the other Active Announcements."
+                : "We could not verify your current plan. Refresh to retry. Draft saves and deletion remain available; additional Active saves require successful server-side plan verification."}
           </s-banner>
 
           <Form method="post">

@@ -7,6 +7,7 @@ import {
   WIDGET_STATUSES,
   WIDGET_TYPES,
 } from "../features/widgets/widget.constants";
+import { getAuthenticatedAppPlan } from "../features/billing/admin-plan.server";
 
 const solutions = [
   {
@@ -43,7 +44,15 @@ const solutions = [
 ] as const;
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { session } = await authenticate.admin(request);
+  const { session, admin } = await authenticate.admin(request);
+
+  let plan: Awaited<ReturnType<typeof getAuthenticatedAppPlan>> | null = null;
+
+  try {
+    plan = await getAuthenticatedAppPlan(admin, session.shop);
+  } catch {
+    console.warn("NoticePro Dashboard plan verification unavailable.");
+  }
 
   const groups = await db.widget.groupBy({
     by: ["type", "status"],
@@ -90,7 +99,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     { saved: 0, active: 0, draft: 0 },
   );
 
-  return { cards, totals };
+  return { cards, totals, plan };
 }
 
 const dashboardGridStyle = {
@@ -107,7 +116,7 @@ const dashboardCardStyle = {
 };
 
 export default function DashboardPage() {
-  const { cards, totals } = useLoaderData<typeof loader>();
+  const { cards, totals, plan } = useLoaderData<typeof loader>();
 
   const metrics = [
     { label: "Saved widgets", value: totals.saved },
@@ -311,11 +320,21 @@ export default function DashboardPage() {
           enabled.
         </p>
       </s-section>
-
-      <s-section heading="Free allowance">
+      <s-section
+        heading={
+          plan === "PRO"
+            ? "Pro allowance"
+            : plan === "FREE"
+              ? "Free allowance"
+              : "Plan verification unavailable"
+        }
+      >
         <p style={{ margin: 0, lineHeight: 1.6 }}>
-          One active Announcement, one active Notice, and one active Countdown
-          can run together. Additional widgets can be saved as drafts.
+          {plan === "PRO"
+            ? "Pro allows unlimited active Announcements, Notices, and Countdowns. Storefront display still depends on theme placement, scheduling, and visitor dismissal."
+            : plan === "FREE"
+              ? "Free displays up to one eligible Announcement, one eligible Notice, and one eligible Countdown together. Additional widgets can be saved as drafts. Records retained after a downgrade are not deleted."
+              : "We could not verify your current plan. Your saved widgets and counts remain available. Refresh to retry. Additional Active saves still require successful server-side plan verification."}
         </p>
       </s-section>
     </s-page>

@@ -19,7 +19,16 @@ import {
 } from "../features/billing/plan-policy.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { session } = await authenticate.admin(request);
+  const { session, admin } = await authenticate.admin(request);
+
+  let plan: AppPlan | null = null;
+
+  try {
+    plan = await getAuthenticatedAppPlan(admin, session.shop);
+  } catch {
+    console.warn("NoticePro Notice plan verification unavailable.");
+  }
+
   const url = new URL(request.url);
   const editId = url.searchParams.get("edit");
 
@@ -40,6 +49,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return {
     notices,
     editingNotice,
+    plan,
   };
 }
 
@@ -171,7 +181,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function NoticePage() {
-  const { notices, editingNotice } = useLoaderData<typeof loader>();
+  const { notices, editingNotice, plan } = useLoaderData<typeof loader>();
+
   const actionData = useActionData<typeof action>();
   const isEditing = Boolean(editingNotice);
 
@@ -190,10 +201,21 @@ export default function NoticePage() {
             below.
           </p>
 
-          <s-banner tone="info" heading="Free plan: one active widget per type">
-            You can run one Announcement, one Notice, and one Countdown at the
-            same time. To activate another Notice, save it as a draft or
-            deactivate your current Notice first.
+          <s-banner
+            tone="info"
+            heading={
+              plan === "PRO"
+                ? "Pro plan: unlimited active widgets"
+                : plan === "FREE"
+                  ? "Free plan: one displayed widget per type"
+                  : "Plan verification unavailable"
+            }
+          >
+            {plan === "PRO"
+              ? "You can activate multiple Announcements, Notices, and Countdowns. Notices display together within the Notice app block."
+              : plan === "FREE"
+                ? "Free displays up to one eligible Announcement, one eligible Notice, and one eligible Countdown together. Save additional Notices as drafts. To activate a different Notice, first deactivate the other Active Notices."
+                : "We could not verify your current plan. Refresh to retry. Draft saves and deletion remain available; additional Active saves require successful server-side plan verification."}
           </s-banner>
 
           <Form method="post">
