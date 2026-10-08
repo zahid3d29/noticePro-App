@@ -1,7 +1,6 @@
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
-import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { Form, useActionData, useLoaderData } from "react-router";
+import { useActionData, useLoaderData } from "react-router";
 
 import { login } from "../../shopify.server";
 import { loginErrorMessage } from "./error.server";
@@ -15,34 +14,33 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const errors = loginErrorMessage(await login(request));
 
-  return {
-    errors,
-  };
+  return { errors };
 };
 
 export default function Auth() {
   const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const [shop, setShop] = useState("");
   const { errors } = actionData || loaderData;
 
   return (
     <AppProvider embedded={false}>
-      <s-page>
-        <Form method="post">
-        <s-section heading="Log in">
-          <s-text-field
-            name="shop"
-            label="Shop domain"
-            details="example.myshopify.com"
-            value={shop}
-            onChange={(e) => setShop(e.currentTarget.value)}
-            autocomplete="on"
-            error={errors.shop}
-          ></s-text-field>
-          <s-button type="submit">Log in</s-button>
+      <s-page heading="NoticePro">
+        <s-section heading="Open NoticePro through Shopify">
+          <p>
+            If NoticePro is installed, open it from your Shopify admin. This
+            page does not accept manual shop-domain entry.
+          </p>
+
+          {errors.shop ? <p role="alert">{errors.shop}</p> : null}
+
+          <p>
+            Need help?{" "}
+            <a href="mailto:noticeproapp@gmail.com">
+              Contact NoticePro support
+            </a>
+            .
+          </p>
         </s-section>
-        </Form>
       </s-page>
     </AppProvider>
   );
