@@ -112,9 +112,9 @@ export default function PrivacyPage() {
       <p>
         To ask about access, correction, or deletion of information handled by
         NoticePro, contact Zahidul Islam at{" "}
-        <a href="mailto:zahid3d9@hotmail.com">zahid3d9@hotmail.com</a>. We may
-        need to verify your identity and connection to the relevant store before
-        acting on a request.
+        <a href="mailto:noticeproapp@gmail.com">noticeproapp@gmail.com</a>. We
+        may need to verify your identity and connection to the relevant store
+        before acting on a request.
       </p>
 
       <h2>Changes to this policy</h2>
