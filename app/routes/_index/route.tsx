@@ -5,8 +5,9 @@ import styles from "./styles.module.css";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
+  const shop = url.searchParams.get("shop");
 
-  if (url.searchParams.get("shop")) {
+  if (shop !== null && shop.trim().length > 0) {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
 
