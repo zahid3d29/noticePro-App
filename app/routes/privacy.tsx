@@ -21,12 +21,7 @@ export default function PrivacyPage() {
       }}
     >
       <h1>NoticePro Privacy Policy</h1>
-      <p>Last updated: 6 October 2026</p>
-
-      <p>
-        Draft for the current hosted testing configuration. This policy must be
-        reviewed before production launch.
-      </p>
+      <p>Last updated: 8 October 2026</p>
 
       <p>
         NoticePro: Alerts &amp; Countdowns is operated by Zahidul Islam, based
@@ -70,12 +65,13 @@ export default function PrivacyPage() {
         The app does not set an automatic expiry for these entries. Visitors can
         remove them by clearing the store&apos;s site data in their browser. The
         dismissal flag is not explicitly included in the widget requests shown
-        in the reviewed storefront code.
+        in the reviewed storefront code. The admin dashboard relies on
+        sessionStorage strictly for persistent scroll-position restoration.
       </p>
 
       <h2>Service providers and technical information</h2>
       <p>
-        The current hosted testing setup uses Shopify, Render for application
+        The current hosted configuration uses Shopify, Render for application
         hosting, and Neon for database hosting. These providers process
         information needed to deliver their services.
       </p>
@@ -104,8 +100,6 @@ export default function PrivacyPage() {
         No separate hosted database exports or external log streaming are
         currently configured. Browser dismissal entries are stored separately on
         visitors&apos; devices and are not removed by server-side deletion.
-        Production hosting and retention settings will be reviewed before
-        launch.
       </p>
 
       <h2>Privacy requests and contact</h2>
