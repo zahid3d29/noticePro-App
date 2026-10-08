@@ -66,7 +66,9 @@ export default function PrivacyPage() {
         remove them by clearing the store&apos;s site data in their browser. The
         dismissal flag is not explicitly included in the widget requests shown
         in the reviewed storefront code. The admin dashboard relies on
-        sessionStorage strictly for persistent scroll-position restoration.
+        sessionStorage for scroll-position restoration and to remember the last
+        handled success-toast identifier so the same notification is not shown
+        repeatedly.
       </p>
 
       <h2>Service providers and technical information</h2>
