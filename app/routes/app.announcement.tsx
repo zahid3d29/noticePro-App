@@ -33,6 +33,25 @@ function toDateTimeLocal(value: Date | null | undefined) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
+function formatScheduleUtc(value: Date | string | null | undefined) {
+  if (!value) return "";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "Invalid saved date";
+
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "UTC",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(date);
+}
+
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session, admin } = await authenticate.admin(request);
 
@@ -492,6 +511,32 @@ export default function AppHome() {
                 </div>
 
                 <p style={{ margin: 0 }}>{widget.message}</p>
+                {widget.startsAt || widget.endsAt ? (
+                  <div
+                    style={{
+                      padding: "12px",
+                      backgroundColor: "#f3f4f6",
+                      color: "#111827",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <strong>Schedule (UTC)</strong>
+
+                    <p style={{ margin: "6px 0 0" }}>
+                      Starts:{" "}
+                      {widget.startsAt
+                        ? formatScheduleUtc(widget.startsAt)
+                        : "No start limit"}
+                    </p>
+
+                    <p style={{ margin: "4px 0 0" }}>
+                      Ends:{" "}
+                      {widget.endsAt
+                        ? formatScheduleUtc(widget.endsAt)
+                        : "No end limit"}
+                    </p>
+                  </div>
+                ) : null}
 
                 <div>
                   <strong>Storefront preview</strong>
